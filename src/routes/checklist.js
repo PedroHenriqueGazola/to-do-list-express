@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-    console.log('olá')
+    console.log('Ola');
     res.send()
 }); 
 router.post('/', (req, res) => {
@@ -23,4 +23,5 @@ router.delete("/:id", (req, res) => {
     console.log(req.params.id)
     res.send(`ID: ${req.params.id}`)
 }) // delete serve para deletar informações
-module.exports = router; 
+module.exports = router;
+
