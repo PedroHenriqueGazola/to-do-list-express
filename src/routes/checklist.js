@@ -7,16 +7,25 @@ router.get('/', async(req, res) => {
         const checklists = await Checklist.find({});
         res.status(200).render('checklists/index', { checklists: checklists });
     }catch(err){
-        res.status(200).render('pages/error', { error: 'Erro ao exibir as listas' });
+        res.status(500).render('pages/error', { error: 'Erro ao exibir as listas' });
     }
 }); 
-router.post('/', async(req, res) => {
-    const { name } = req.body;
+router.get('/new', async(req, res) => {
     try {
-        const checklist = await Checklist.create({ name })
-        res.status(200).json(checklist);
+        const checklists = new Checklist()
+        res.status(200).render('checklists/new.ejs', { checklists: checklists });
+    } catch (error) {
+        res.status(500).render('pages/error', { error: 'Erro ao carregar formulario' });
+    }
+})
+router.post('/', async(req, res) => {
+    const { name } = req.body.checklist;
+    const checklist = new Checklist({ name });
+    try {
+        await checklist.save();
+        res.redirect(`/checklists`)
     }catch (err) {
-        res.status(422).json({err});
+        res.status(422).render('checklists/new', { checklists: {...checklist, err}});
     }
 }) // Post serve para criar um registro
 
@@ -25,7 +34,7 @@ router.get("/:id", async(req, res) => {
         const checklist = await Checklist.findById(req.params.id);
         res.status(200).render('checklists/show', { checklist: checklist });
     }catch(err){
-        res.status(200).render('pages/error', { error: 'Erro ao exibir as listas de tarefas' });
+        res.status(500).render('pages/error', { error: 'Erro ao exibir as listas de tarefas' });
     }
     
 }) // get serve para buscar informações
