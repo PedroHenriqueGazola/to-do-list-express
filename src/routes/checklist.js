@@ -1,4 +1,5 @@
 const express = require('express');
+const checklist = require('../models/checklist');
 const router = express.Router();
 const Checklist = require('../models/checklist');
 
@@ -16,6 +17,14 @@ router.get('/new', async(req, res) => {
         res.status(200).render('checklists/new.ejs', { checklists: checklists });
     } catch (error) {
         res.status(500).render('pages/error', { error: 'Erro ao carregar formulario' });
+    }
+})
+router.get('/:id/edit', async(req, res) => {
+    try {
+        let checklist = await Checklist.findById(req.params.id);
+        res.status(200).render('checklists/edit', { checklist: checklist });
+    } catch (error) {
+        res.status(500).render('pages/error', { error: 'Erro ao exibir ediçao' });
     }
 })
 router.post('/', async(req, res) => {
@@ -39,13 +48,15 @@ router.get("/:id", async(req, res) => {
     
 }) // get serve para buscar informações
 
-router.put("/:id", async(req, res) => {
-    let { name } = req.body;
+router.put('/:id', async (req, res) => {
+    let { name } = req.body.checklist
+   
     try {
-        let checklist = await Checklist.findByIdAndUpdate(req.params.id, {name}, {new: true});
-        res.status(200).json(checklist);
+      let checklist = await Checklist.findByIdAndUpdate(req.params.id, { name })
+      res.redirect('/checklists')
     } catch (error) {
-        res.status(422).json(error);
+      let errors = error.errors
+      res.status(422).render('checklists/edit', { checklist: {...checklist, errors} })
     }
 }) // put serve para atualizar informações
 router.delete("/:id", async(req, res) => {
@@ -54,7 +65,7 @@ router.delete("/:id", async(req, res) => {
         let checklist = await Checklist.findByIdAndRemove(req.params.id);
         res.status(200).json(checklist);
     } catch (error) {
-        
+        res.status(500).render('pages/error', { error: 'Erro ao excluir lista' });
     }
 }) // delete serve para deletar informações
 module.exports = router;
