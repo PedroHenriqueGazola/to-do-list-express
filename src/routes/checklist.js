@@ -40,7 +40,7 @@ router.post('/', async(req, res) => {
 
 router.get("/:id", async(req, res) => {
     try{
-        const checklist = await Checklist.findById(req.params.id);
+        const checklist = await Checklist.findById(req.params.id).populate('tasks');
         res.status(200).render('checklists/show', { checklist: checklist });
     }catch(err){
         res.status(500).render('pages/error', { error: 'Erro ao exibir as listas de tarefas' });
@@ -63,9 +63,9 @@ router.delete("/:id", async(req, res) => {
     let { name } = req.body;
     try {
         let checklist = await Checklist.findByIdAndRemove(req.params.id);
-        res.status(200).json(checklist);
+        res.redirect('/checklists')
     } catch (error) {
-        res.status(500).render('pages/error', { error: 'Erro ao excluir lista' });
+        res.status(500).render('pages/error', { error: 'Erro ao deletar a lista de tarefa' });
     }
 }) // delete serve para deletar informações
 module.exports = router;
